@@ -23,13 +23,13 @@ export default function DaftarBerita() {
       <div>
         {/* Header Halaman Berita dengan Latar Gambar dan Animasi */}
       <div className="relative bg-slate-900 py-20 text-center text-white border-b-4 border-amber-500 overflow-hidden mb-12">
-        
+
         {/* Gambar Latar Belakang */}
         <div className="absolute inset-0 z-0">
-          <img 
-            src="/berita-bg.png" 
-            alt="Latar Berita SMAN 1 Tegal" 
-            className="w-full h-full object-cover opacity-100" 
+          <img
+            src="/berita-bg.png"
+            alt="Latar Berita SMAN 1 Tegal"
+            className="w-full h-full object-cover opacity-100"
           />
           {/* Overlay Gelap */}
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-slate-950/90"></div>
@@ -45,12 +45,12 @@ export default function DaftarBerita() {
           </p>
         </div>
       </div>
-        
+
         {/* Grid 6 Berita */}
 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {berita.map((item) => (
-              <BeritaCard 
+              <BeritaCard
                 key={item.id}
                 id={item.id}
                 judul={item.judul}
