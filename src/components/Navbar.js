@@ -14,6 +14,10 @@ export default function Navbar() {
     setMounted(true);
   }, []);
 
+  // Hanya hitung status "aktif" setelah mounted di client,
+  // supaya HTML server & client selalu sama saat hydration (hindari hydration error).
+  const isActive = (path) => mounted && pathname === path;
+
   return (
     <nav className="bg-white dark:bg-slate-900 shadow-md sticky top-0 z-50 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -27,20 +31,20 @@ export default function Navbar() {
 
           {/* Menu Desktop */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/" className={`font-medium px-1 py-5 transition-colors ${pathname === '/' ? 'text-amber-500 border-b-2 border-amber-500' : 'text-slate-600 dark:text-slate-300 hover:text-amber-500 dark:hover:text-amber-400'}`}>
+            <Link href="/" className={`font-medium px-1 py-5 transition-colors ${isActive('/') ? 'text-amber-500 border-b-2 border-amber-500' : 'text-slate-600 dark:text-slate-300 hover:text-amber-500 dark:hover:text-amber-400'}`}>
               Home
             </Link>
-            <Link href="/about" className={`font-medium px-1 py-5 transition-colors ${pathname === '/about' ? 'text-amber-500 border-b-2 border-amber-500' : 'text-slate-600 dark:text-slate-300 hover:text-amber-500 dark:hover:text-amber-400'}`}>
+            <Link href="/about" className={`font-medium px-1 py-5 transition-colors ${isActive('/about') ? 'text-amber-500 border-b-2 border-amber-500' : 'text-slate-600 dark:text-slate-300 hover:text-amber-500 dark:hover:text-amber-400'}`}>
               About
             </Link>
-            <Link href="/berita" className={`font-medium px-1 py-5 transition-colors ${pathname === '/berita' ? 'text-amber-500 border-b-2 border-amber-500' : 'text-slate-600 dark:text-slate-300 hover:text-amber-500 dark:hover:text-amber-400'}`}>
+            <Link href="/berita" className={`font-medium px-1 py-5 transition-colors ${isActive('/berita') ? 'text-amber-500 border-b-2 border-amber-500' : 'text-slate-600 dark:text-slate-300 hover:text-amber-500 dark:hover:text-amber-400'}`}>
               Berita
             </Link>
             {/* Tambahan Menu Guru dan Ekskul */}
-            <Link href="/guru" className={`font-medium px-1 py-5 transition-colors ${pathname === '/guru' ? 'text-amber-500 border-b-2 border-amber-500' : 'text-slate-600 dark:text-slate-300 hover:text-amber-500 dark:hover:text-amber-400'}`}>
+            <Link href="/guru" className={`font-medium px-1 py-5 transition-colors ${isActive('/guru') ? 'text-amber-500 border-b-2 border-amber-500' : 'text-slate-600 dark:text-slate-300 hover:text-amber-500 dark:hover:text-amber-400'}`}>
               Guru
             </Link>
-            <Link href="/ekstrakurikuler" className={`font-medium px-1 py-5 transition-colors ${pathname === '/ekskul' ? 'text-amber-500 border-b-2 border-amber-500' : 'text-slate-600 dark:text-slate-300 hover:text-amber-500 dark:hover:text-amber-400'}`}>
+            <Link href="/ekstrakurikuler" className={`font-medium px-1 py-5 transition-colors ${isActive('/ekstrakurikuler') ? 'text-amber-500 border-b-2 border-amber-500' : 'text-slate-600 dark:text-slate-300 hover:text-amber-500 dark:hover:text-amber-400'}`}>
               Ekstrakurikuler
             </Link>
           </div>
@@ -81,20 +85,20 @@ export default function Navbar() {
       {/* Menu Dropdown Mobile */}
       {isOpen && (
         <div className="md:hidden bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800 px-4 pt-2 pb-4 space-y-2 shadow-lg absolute w-full left-0 transition-colors">
-          <Link href="/" onClick={() => setIsOpen(false)} className={`block px-3 py-2 rounded-md font-medium ${pathname === '/' ? 'bg-amber-50 dark:bg-slate-800 text-amber-600 dark:text-amber-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-amber-500'}`}>
+          <Link href="/" onClick={() => setIsOpen(false)} className={`block px-3 py-2 rounded-md font-medium ${isActive('/') ? 'bg-amber-50 dark:bg-slate-800 text-amber-600 dark:text-amber-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-amber-500'}`}>
             Home
           </Link>
-          <Link href="/about" onClick={() => setIsOpen(false)} className={`block px-3 py-2 rounded-md font-medium ${pathname === '/about' ? 'bg-amber-50 dark:bg-slate-800 text-amber-600 dark:text-amber-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-amber-500'}`}>
+          <Link href="/about" onClick={() => setIsOpen(false)} className={`block px-3 py-2 rounded-md font-medium ${isActive('/about') ? 'bg-amber-50 dark:bg-slate-800 text-amber-600 dark:text-amber-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-amber-500'}`}>
             About
           </Link>
-          <Link href="/berita" onClick={() => setIsOpen(false)} className={`block px-3 py-2 rounded-md font-medium ${pathname === '/berita' ? 'bg-amber-50 dark:bg-slate-800 text-amber-600 dark:text-amber-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-amber-500'}`}>
+          <Link href="/berita" onClick={() => setIsOpen(false)} className={`block px-3 py-2 rounded-md font-medium ${isActive('/berita') ? 'bg-amber-50 dark:bg-slate-800 text-amber-600 dark:text-amber-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-amber-500'}`}>
             Berita
           </Link>
           {/* Tambahan Menu Guru dan Ekskul untuk Mobile */}
-          <Link href="/guru" onClick={() => setIsOpen(false)} className={`block px-3 py-2 rounded-md font-medium ${pathname === '/guru' ? 'bg-amber-50 dark:bg-slate-800 text-amber-600 dark:text-amber-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-amber-500'}`}>
+          <Link href="/guru" onClick={() => setIsOpen(false)} className={`block px-3 py-2 rounded-md font-medium ${isActive('/guru') ? 'bg-amber-50 dark:bg-slate-800 text-amber-600 dark:text-amber-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-amber-500'}`}>
             Guru
           </Link>
-          <Link href="/ekstrakurikuler" onClick={() => setIsOpen(false)} className={`block px-3 py-2 rounded-md font-medium ${pathname === '/ekskul' ? 'bg-amber-50 dark:bg-slate-800 text-amber-600 dark:text-amber-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-amber-500'}`}>
+          <Link href="/ekstrakurikuler" onClick={() => setIsOpen(false)} className={`block px-3 py-2 rounded-md font-medium ${isActive('/ekstrakurikuler') ? 'bg-amber-50 dark:bg-slate-800 text-amber-600 dark:text-amber-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-amber-500'}`}>
             Ekstrakurikuler
           </Link>
         </div>

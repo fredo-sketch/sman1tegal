@@ -1,12 +1,30 @@
+"use client";
 import Link from "next/link";
-import { dummyBerita } from "../page"; 
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import { dummyBerita } from "../../../data/beritaData";
 
-export const instant = false;
+export default function DetailBerita() {
+  const params = useParams();
+  const id = params.id;
 
-export default async function DetailBerita({ params }) {
-  const { id } = await params;
-  
-  const berita = dummyBerita.find((item) => item.id.toString() === id);
+  const [berita, setBerita] = useState(() =>
+    dummyBerita.find((item) => item.id.toString() === id) || null
+  );
+
+  useEffect(() => {
+    const dataLokal = localStorage.getItem('dataBerita');
+    let sumberData;
+    if (dataLokal) {
+      sumberData = JSON.parse(dataLokal);
+    } else {
+      localStorage.setItem('dataBerita', JSON.stringify(dummyBerita));
+      sumberData = dummyBerita;
+    }
+    const ditemukan = sumberData.find((item) => item.id.toString() === id);
+    setBerita(ditemukan || null);
+  }, [id]);
+
   if (!berita) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-slate-900 transition-colors duration-300">
@@ -36,7 +54,7 @@ export default async function DetailBerita({ params }) {
           {/* Gambar Berita */}
           <div className="w-full rounded-xl overflow-hidden mb-8 shadow-sm bg-gray-100 dark:bg-slate-800 flex justify-center">
             <img 
-              src={berita.gambar} 
+              src={berita.gambar || berita.foto} 
               alt={berita.judul} 
               className="w-full h-auto max-h-[600px] object-contain"
             />

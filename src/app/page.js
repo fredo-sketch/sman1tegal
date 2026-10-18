@@ -1,7 +1,7 @@
 import BeritaCard from '../components/BeritaCard';
 import Link from 'next/link';
 import AnimatedCounter from '../components/AnimatedCounter';
-import { dummyBerita } from './berita/page';
+import { dummyBerita } from '../data/beritaData';
 
 export default function Home() {
   return (

@@ -53,6 +53,25 @@ export default function AdminPage() {
     setPassword('');
   };
 
+  // --- FUNGSI UPLOAD GAMBAR (konversi file ke base64 Data URL) ---
+  const handleFileChange = (e, setForm) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Batas ukuran file 1.5MB agar localStorage tidak cepat penuh
+    if (file.size > 1.5 * 1024 * 1024) {
+      alert("Ukuran gambar terlalu besar! Maksimal 1.5MB.");
+      e.target.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setForm((prev) => ({ ...prev, foto: reader.result }));
+    };
+    reader.readAsDataURL(file);
+  };
+
   // --- FUNGSI KELOLA GURU ---
   const handleTambahGuru = (e) => {
     e.preventDefault();
@@ -163,11 +182,24 @@ export default function AdminPage() {
         {tab === 'guru' && (
           <div className="p-6 md:p-8">
             <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-6">Tambah Guru Baru</h2>
-            <form onSubmit={handleTambahGuru} className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-              {/* Tambahan text-slate-900 dark:text-white dan placeholder-gray-400 pada semua form input */}
-              <input required type="text" placeholder="Nama Guru (beserta gelar)" className="border border-gray-300 dark:border-slate-600 p-2 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-gray-400" value={formGuru.nama} onChange={(e) => setFormGuru({...formGuru, nama: e.target.value})} />
-              <input required type="text" placeholder="Mata Pelajaran / Jabatan" className="border border-gray-300 dark:border-slate-600 p-2 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-gray-400" value={formGuru.mapel} onChange={(e) => setFormGuru({...formGuru, mapel: e.target.value})} />
-              <button type="submit" className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded transition-colors">Tambah Guru</button>
+            <form onSubmit={handleTambahGuru} className="mb-8">
+              {/* Upload Foto Guru */}
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100 dark:bg-slate-700 border-2 border-amber-500 flex-shrink-0">
+                  <img src={formGuru.foto} alt="Preview" className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Foto Guru</label>
+                  <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setFormGuru)} className="block w-full text-sm text-slate-600 dark:text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-bold file:bg-amber-500 file:text-white hover:file:bg-amber-600" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Tambahan text-slate-900 dark:text-white dan placeholder-gray-400 pada semua form input */}
+                <input required type="text" placeholder="Nama Guru (beserta gelar)" className="border border-gray-300 dark:border-slate-600 p-2 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-gray-400" value={formGuru.nama} onChange={(e) => setFormGuru({...formGuru, nama: e.target.value})} />
+                <input required type="text" placeholder="Mata Pelajaran / Jabatan" className="border border-gray-300 dark:border-slate-600 p-2 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-gray-400" value={formGuru.mapel} onChange={(e) => setFormGuru({...formGuru, mapel: e.target.value})} />
+                <button type="submit" className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded transition-colors">Tambah Guru</button>
+              </div>
             </form>
 
             <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-4">Daftar Guru Saat Ini</h2>
@@ -201,6 +233,17 @@ export default function AdminPage() {
           <div className="p-6 md:p-8">
             <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-6">Tambah Ekskul Baru</h2>
             <form onSubmit={handleTambahEkskul} className="flex flex-col gap-4 mb-8">
+              {/* Upload Foto Ekskul */}
+              <div className="flex items-center gap-4">
+                <div className="w-20 h-20 rounded overflow-hidden bg-gray-100 dark:bg-slate-700 border-2 border-amber-500 flex-shrink-0">
+                  <img src={formEkskul.foto} alt="Preview" className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Foto Ekskul</label>
+                  <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setFormEkskul)} className="block w-full text-sm text-slate-600 dark:text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-bold file:bg-amber-500 file:text-white hover:file:bg-amber-600" />
+                </div>
+              </div>
+
               <input required type="text" placeholder="Nama Ekstrakurikuler" className="border border-gray-300 dark:border-slate-600 p-2 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-gray-400" value={formEkskul.nama} onChange={(e) => setFormEkskul({...formEkskul, nama: e.target.value})} />
               <textarea required placeholder="Deskripsi Singkat" className="border border-gray-300 dark:border-slate-600 p-2 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-gray-400 h-24" value={formEkskul.deskripsi} onChange={(e) => setFormEkskul({...formEkskul, deskripsi: e.target.value})}></textarea>
               <button type="submit" className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded w-48 transition-colors">Tambah Ekskul</button>
@@ -237,6 +280,17 @@ export default function AdminPage() {
           <div className="p-6 md:p-8">
             <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-6">Tambah Berita Baru</h2>
             <form onSubmit={handleTambahBerita} className="flex flex-col gap-4 mb-8">
+              {/* Upload Foto Berita */}
+              <div className="flex items-center gap-4">
+                <div className="w-20 h-20 rounded overflow-hidden bg-gray-100 dark:bg-slate-700 border-2 border-amber-500 flex-shrink-0">
+                  <img src={formBerita.foto} alt="Preview" className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Foto Berita</label>
+                  <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setFormBerita)} className="block w-full text-sm text-slate-600 dark:text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-bold file:bg-amber-500 file:text-white hover:file:bg-amber-600" />
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input required type="text" placeholder="Judul Berita" className="border border-gray-300 dark:border-slate-600 p-2 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-gray-400" value={formBerita.judul} onChange={(e) => setFormBerita({...formBerita, judul: e.target.value})} />
                 <input required type="date" className="border border-gray-300 dark:border-slate-600 p-2 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-white" value={formBerita.tanggal} onChange={(e) => setFormBerita({...formBerita, tanggal: e.target.value})} />
