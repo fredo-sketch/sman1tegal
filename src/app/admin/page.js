@@ -13,6 +13,12 @@ function formatTanggal(dateStr) {
   }).format(date);
 }
 
+// Supabase Auth butuh format email, jadi username dipetakan ke email internal.
+// Contoh: username "smansaku" -> "smansaku@sman1tegal.sch.id"
+// (user dengan email ini dibuat manual di Supabase Dashboard > Authentication > Users)
+const ADMIN_EMAIL_DOMAIN = 'sman1tegal.sch.id';
+const usernameToEmail = (u) => `${u.trim().toLowerCase()}@${ADMIN_EMAIL_DOMAIN}`;
+
 const FORM_GURU_INIT = { nama: '', mapel: '', foto_url: '/placeholder.jpg' };
 const FORM_EKSKUL_INIT = { nama: '', deskripsi: '', foto_url: '/placeholder.jpg' };
 const FORM_BERITA_INIT = { judul: '', tanggal: '', ringkasan: '', isi: '', foto_url: '/placeholder.jpg' };
@@ -20,7 +26,7 @@ const FORM_BERITA_INIT = { judul: '', tanggal: '', ringkasan: '', isi: '', foto_
 export default function AdminPage() {
   // --- STATE LOGIN ---
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loadingAuth, setLoadingAuth] = useState(true);
@@ -112,9 +118,9 @@ export default function AdminPage() {
     e.preventDefault();
     setError('');
     setLoadingAuth(true);
-    const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+    const { error: authError } = await supabase.auth.signInWithPassword({ email: usernameToEmail(username), password });
     if (authError) {
-      setError('Email atau password salah!');
+      setError('Username atau password salah!');
     }
     setLoadingAuth(false);
   };
@@ -122,7 +128,7 @@ export default function AdminPage() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setIsLoggedIn(false);
-    setEmail('');
+    setUsername('');
     setPassword('');
   };
 
@@ -424,7 +430,7 @@ export default function AdminPage() {
             {error && <div className="bg-red-100 text-red-700 p-3 rounded text-sm text-center font-semibold">{error}</div>}
             <div className="space-y-4">
               {/* Tambahan text-slate-900 dark:text-white dan placeholder-gray-400 */}
-              <input type="email" required className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-amber-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-gray-400" placeholder="Email Admin" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <input type="text" required autoComplete="username" className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-amber-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-gray-400" placeholder="Username Admin" value={username} onChange={(e) => setUsername(e.target.value)} />
               <input type="password" required className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-amber-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-gray-400" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
             <button type="submit" disabled={loadingAuth} className="w-full py-3 px-4 rounded-lg shadow-sm text-white bg-amber-600 hover:bg-amber-700 font-bold transition-colors disabled:opacity-50">
