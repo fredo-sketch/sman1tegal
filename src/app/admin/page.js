@@ -17,7 +17,10 @@ function formatTanggal(dateStr) {
 // Contoh: username "smansaku" -> "smansaku@sman1tegal.sch.id"
 // (user dengan email ini dibuat manual di Supabase Dashboard > Authentication > Users)
 const ADMIN_EMAIL_DOMAIN = 'sman1tegal.sch.id';
-const usernameToEmail = (u) => `${u.trim().toLowerCase()}@${ADMIN_EMAIL_DOMAIN}`;
+const usernameToEmail = (u) => {
+  const v = u.trim().toLowerCase();
+  return v.includes('@') ? v : `${v}@${ADMIN_EMAIL_DOMAIN}`;
+};
 
 const FORM_GURU_INIT = { nama: '', mapel: '', foto_url: '/placeholder.jpg' };
 const FORM_EKSKUL_INIT = { nama: '', deskripsi: '', foto_url: '/placeholder.jpg' };
