@@ -1,9 +1,44 @@
 import BeritaCard from '../components/BeritaCard';
 import Link from 'next/link';
 import AnimatedCounter from '../components/AnimatedCounter';
-import { dummyBerita } from '../data/beritaData';
+import { supabase } from '@/lib/supabaseClient';
 
-export default function Home() {
+export const instant = false;
+
+// Helper: format DATE dari Postgres (YYYY-MM-DD) ke "11 September 2026"
+function formatTanggal(dateStr) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr + 'T00:00:00');
+  return new Intl.DateTimeFormat('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(date);
+}
+
+// Fetch 3 berita terbaru di server-side (Server Component)
+async function getBeritaTerbaru() {
+  try {
+    const { data, error } = await supabase
+      .from('berita')
+      .select('id, judul, tanggal, ringkasan, foto_url')
+      .order('tanggal', { ascending: false })
+      .limit(3);
+
+    if (error) {
+      console.error('Gagal memuat berita untuk homepage:', error.message);
+      return [];
+    }
+    return data || [];
+  } catch (err) {
+    console.error('Error saat fetch berita:', err);
+    return [];
+  }
+}
+
+export default async function Home() {
+  const beritaTerbaru = await getBeritaTerbaru();
+
   return (
     <div>
       {/* 1. HERO SECTION */}
@@ -94,7 +129,7 @@ Jelajahi lebih luas website kami dan manfaatkan dengan sebaik-baiknya.
       <section className="py-20 bg-white dark:bg-slate-900 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-sm font-bold text-amber-500 tracking-widest uppercase">Profil & Komitmen Akademik</h2>
+            <h2 className="text-sm font-bold text-amber-500 tracking-widest uppercase">Profil &amp; Komitmen Akademik</h2>
             <h3 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mt-2">Menyemai Karakter, Merajut Prestasi</h3>
           </div>
           
@@ -110,12 +145,12 @@ Jelajahi lebih luas website kami dan manfaatkan dengan sebaik-baiknya.
                <div>
                  <h4 className="font-bold text-xl text-slate-900 dark:text-white">Dr. Budi Setiawan, M.Pd.</h4>
                  <p className="text-sm text-amber-600 dark:text-amber-400 font-medium mb-3">Kepala Sekolah SMAN 1 Tegal</p>
-                 <p className="text-slate-600 dark:text-slate-300 text-sm italic">"Kami berkomitmen mencetak pelajar yang tidak hanya cerdas secara akademik, namun juga memiliki akhlak mulia dan kepedulian sosial."</p>
+                 <p className="text-slate-600 dark:text-slate-300 text-sm italic">&quot;Kami berkomitmen mencetak pelajar yang tidak hanya cerdas secara akademik, namun juga memiliki akhlak mulia dan kepedulian sosial.&quot;</p>
                </div>
             </div>
             
             <div>
-              <h4 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 leading-snug">Membangun Generasi Emas yang Cerdas & Berintegritas</h4>
+              <h4 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 leading-snug">Membangun Generasi Emas yang Cerdas &amp; Berintegritas</h4>
               <p className="text-slate-600 dark:text-slate-300 mb-4 leading-relaxed">
                 Dengan kebersamaan dan rekam jejak pengabdian lebih dari 70 tahun, SMA Negeri 1 Tegal konsisten mengemban amanah sebagai institusi pendidikan berkualitas di Jawa Tengah.
               </p>
@@ -142,16 +177,22 @@ Jelajahi lebih luas website kami dan manfaatkan dengan sebaik-baiknya.
           
       {/* Grid Berita Terbaru */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-          {dummyBerita.slice(0, 3).map((berita) => (
-            <BeritaCard 
-              key={berita.id}
-              id={berita.id}
-              judul={berita.judul}
-              tanggal={berita.tanggal}
-              ringkasan={berita.ringkasan}
-              gambar={berita.gambar}
-            />
-          ))}
+          {beritaTerbaru.length > 0 ? (
+            beritaTerbaru.map((berita) => (
+              <BeritaCard 
+                key={berita.id}
+                id={berita.id}
+                judul={berita.judul}
+                tanggal={formatTanggal(berita.tanggal)}
+                ringkasan={berita.ringkasan}
+                gambar={berita.foto_url}
+              />
+            ))
+          ) : (
+            <p className="col-span-3 text-center text-slate-500 dark:text-slate-400 py-8">
+              Belum ada berita terbaru.
+            </p>
+          )}
         </div>
         </div>
       </section>

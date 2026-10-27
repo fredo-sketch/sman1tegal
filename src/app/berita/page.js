@@ -1,21 +1,43 @@
 "use client";
 import { useState, useEffect } from 'react';
 import BeritaCard from '../../components/BeritaCard';
-import { dummyBerita } from '../../data/beritaData';
+import { supabase } from '@/lib/supabaseClient';
 
-export { dummyBerita };
+// Helper: format DATE dari Postgres (YYYY-MM-DD) ke "11 September 2026"
+function formatTanggal(dateStr) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr + 'T00:00:00'); // Hindari timezone shift
+  return new Intl.DateTimeFormat('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(date);
+}
 
 export default function DaftarBerita() {
-  const [berita, setBerita] = useState(dummyBerita);
+  const [berita, setBerita] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const dataLokal = localStorage.getItem('dataBerita');
-    if (dataLokal) {
-      setBerita(JSON.parse(dataLokal));
-    } else {
-      localStorage.setItem('dataBerita', JSON.stringify(dummyBerita));
-      setBerita(dummyBerita);
+    async function fetchBerita() {
+      setLoading(true);
+      setError(null);
+      const { data, error: err } = await supabase
+        .from('berita')
+        .select('id, judul, tanggal, ringkasan, foto_url')
+        .order('tanggal', { ascending: false });
+
+      if (err) {
+        console.error('Gagal memuat data berita:', err.message);
+        setError('Gagal memuat daftar berita. Silakan coba lagi.');
+      } else {
+        setBerita(data || []);
+      }
+      setLoading(false);
     }
+
+    fetchBerita();
   }, []);
 
   return (
@@ -46,20 +68,40 @@ export default function DaftarBerita() {
         </div>
       </div>
 
-        {/* Grid 6 Berita */}
+        {/* Grid Berita */}
 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {berita.map((item) => (
-              <BeritaCard
-                key={item.id}
-                id={item.id}
-                judul={item.judul}
-                tanggal={item.tanggal}
-                ringkasan={item.ringkasan}
-                gambar={item.gambar || item.foto}
-              />
-            ))}
-          </div>
+          {loading && (
+            <div className="text-center py-20 text-slate-500 dark:text-slate-400">
+              <p className="text-lg font-medium">Memuat berita...</p>
+            </div>
+          )}
+
+          {error && (
+            <div className="text-center py-20">
+              <p className="text-red-500 font-semibold">{error}</p>
+            </div>
+          )}
+
+          {!loading && !error && berita.length === 0 && (
+            <div className="text-center py-20 text-slate-500 dark:text-slate-400">
+              <p>Belum ada berita.</p>
+            </div>
+          )}
+
+          {!loading && !error && berita.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {berita.map((item) => (
+                <BeritaCard
+                  key={item.id}
+                  id={item.id}
+                  judul={item.judul}
+                  tanggal={formatTanggal(item.tanggal)}
+                  ringkasan={item.ringkasan}
+                  gambar={item.foto_url}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
