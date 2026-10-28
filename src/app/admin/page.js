@@ -22,6 +22,17 @@ const usernameToEmail = (u) => {
   return v.includes('@') ? v : `${v}@${ADMIN_EMAIL_DOMAIN}`;
 };
 
+// fetch ke API admin dengan menyertakan access token sesi Supabase,
+// karena API route memverifikasi lewat header Authorization: Bearer <token>
+async function authFetch(url, options = {}) {
+  const { data: { session } } = await supabase.auth.getSession();
+  const headers = { ...(options.headers || {}) };
+  if (session?.access_token) {
+    headers['Authorization'] = `Bearer ${session.access_token}`;
+  }
+  return fetch(url, { ...options, headers });
+}
+
 const FORM_GURU_INIT = { nama: '', mapel: '', foto_url: '/placeholder.jpg' };
 const FORM_EKSKUL_INIT = { nama: '', deskripsi: '', foto_url: '/placeholder.jpg' };
 const FORM_BERITA_INIT = { judul: '', tanggal: '', ringkasan: '', isi: '', foto_url: '/placeholder.jpg' };
@@ -153,7 +164,7 @@ export default function AdminPage() {
     fd.append('file', file);
 
     try {
-      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
+      const res = await authFetch('/api/admin/upload', { method: 'POST', body: fd });
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || 'Upload gagal');
       setForm((prev) => ({ ...prev, foto_url: result.url }));
@@ -175,7 +186,7 @@ export default function AdminPage() {
     if (!session) { alert('Sesi habis, silakan login kembali.'); setSubmitting(false); return; }
 
     try {
-      const res = await fetch('/api/admin/guru', {
+      const res = await authFetch('/api/admin/guru', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formGuru),
@@ -205,7 +216,7 @@ export default function AdminPage() {
     if (!session) { alert('Sesi habis, silakan login kembali.'); setSubmitting(false); return; }
 
     try {
-      const res = await fetch(`/api/admin/guru/${editingGuruId}`, {
+      const res = await authFetch(`/api/admin/guru/${editingGuruId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formGuru),
@@ -234,7 +245,7 @@ export default function AdminPage() {
     if (!session) { alert('Sesi habis, silakan login kembali.'); return; }
 
     try {
-      const res = await fetch(`/api/admin/guru/${id}`, { method: 'DELETE' });
+      const res = await authFetch(`/api/admin/guru/${id}`, { method: 'DELETE' });
       if (!res.ok) {
         const result = await res.json();
         throw new Error(result.error || 'Gagal menghapus guru');
@@ -255,7 +266,7 @@ export default function AdminPage() {
     if (!session) { alert('Sesi habis, silakan login kembali.'); setSubmitting(false); return; }
 
     try {
-      const res = await fetch('/api/admin/ekskul', {
+      const res = await authFetch('/api/admin/ekskul', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formEkskul),
@@ -285,7 +296,7 @@ export default function AdminPage() {
     if (!session) { alert('Sesi habis, silakan login kembali.'); setSubmitting(false); return; }
 
     try {
-      const res = await fetch(`/api/admin/ekskul/${editingEkskulId}`, {
+      const res = await authFetch(`/api/admin/ekskul/${editingEkskulId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formEkskul),
@@ -314,7 +325,7 @@ export default function AdminPage() {
     if (!session) { alert('Sesi habis, silakan login kembali.'); return; }
 
     try {
-      const res = await fetch(`/api/admin/ekskul/${id}`, { method: 'DELETE' });
+      const res = await authFetch(`/api/admin/ekskul/${id}`, { method: 'DELETE' });
       if (!res.ok) {
         const result = await res.json();
         throw new Error(result.error || 'Gagal menghapus ekskul');
@@ -335,7 +346,7 @@ export default function AdminPage() {
     if (!session) { alert('Sesi habis, silakan login kembali.'); setSubmitting(false); return; }
 
     try {
-      const res = await fetch('/api/admin/berita', {
+      const res = await authFetch('/api/admin/berita', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formBerita),
@@ -366,7 +377,7 @@ export default function AdminPage() {
     if (!session) { alert('Sesi habis, silakan login kembali.'); setSubmitting(false); return; }
 
     try {
-      const res = await fetch(`/api/admin/berita/${editingBeritaId}`, {
+      const res = await authFetch(`/api/admin/berita/${editingBeritaId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formBerita),
@@ -395,7 +406,7 @@ export default function AdminPage() {
     if (!session) { alert('Sesi habis, silakan login kembali.'); return; }
 
     try {
-      const res = await fetch(`/api/admin/berita/${id}`, { method: 'DELETE' });
+      const res = await authFetch(`/api/admin/berita/${id}`, { method: 'DELETE' });
       if (!res.ok) {
         const result = await res.json();
         throw new Error(result.error || 'Gagal menghapus berita');
